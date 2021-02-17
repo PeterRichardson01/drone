@@ -35,9 +35,14 @@
 //                                   id, address
 Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28);
 
+imu::Vector<3> linacc[5]; //size affects filter size: must be at least 2.
+imu::Vector<3> angle;
 
-  imu::Vector<3> linacc[10];
-  imu::Vector<3> angle;
+imu::Vector<3> linvel[2];
+imu::Vector<3> linpos;
+
+unsigned long totaltime;
+unsigned long looptime;
 
 /**************************************************************************/
 /*
@@ -142,7 +147,23 @@ void setup(void)
   /* Optional: Display current status */
   displaySensorStatus();
 
+  uint8_t system, gyro, accel, mag;
+  system = gyro = accel = mag = 0;
+  bno.getCalibration(&system, &gyro, &accel, &mag);
+  while((system+gyro+accel+mag) < 12)
+  {
+    bno.getCalibration(&system, &gyro, &accel, &mag);
+    Serial.print(system, DEC);
+    Serial.print("\t");
+    Serial.print(gyro, DEC);
+    Serial.print("\t");
+    Serial.print(accel, DEC);
+    Serial.print("\t");
+    Serial.print(mag, DEC);
+  }
+
   bno.setExtCrystalUse(true);
+  totaltime = millis();
 }
 
 /**************************************************************************/
@@ -153,7 +174,8 @@ void setup(void)
 /**************************************************************************/
 void loop(void)
 {
-  for(int i = 9; i > 0; i--)
+  /* Get and filter sensor data */
+  for(int i = sizeof(linacc)-1; i > 0; i--)
   {
     linacc[i] = linacc[i-1];
   }
@@ -161,12 +183,17 @@ void loop(void)
   angle     = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
   linacc[0] = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
 
-  for(int i = 0; i < 10; i++)
+  for(int i = 0; i < sizeof(linacc); i++)
   {
     linacc[0] = linacc[0] + linacc[i];
   }
 
-  linacc[0] = linacc[0]/10;
+  linacc[0] = linacc[0]/sizeof(linacc);
+
+  linvel[1] = linvel[0];
+  linvel[0] = linvel[1] + ( linacc[0]+linacc[1] ).scale( (double)looptime*0.5 );
+
+  linpos = linpos + ( linvel[0]+linvel[1] ).scale( (double)looptime*0.5 );
 
   /*Serial.print(angle.x(), 4);
   Serial.print("\t");
@@ -174,16 +201,22 @@ void loop(void)
   Serial.print("\t");
   Serial.print(angle.z(), 4);
   Serial.print("\t");
-*/
-  Serial.print(linacc[0].y(), 4);
+  */
+  
+  Serial.print(linacc[0].z(), 4);
   Serial.print("\t");
+  Serial.print(linvel[0].z(), 4);
+  Serial.print("\t");
+  Serial.print(linpos.z(), 4);
+  
   /*Serial.print(linacc[0].y(), 4);
   Serial.print("\t");
   Serial.print(linacc[0].z(), 4);
   Serial.print("\t");
-*/
+  */
+  
   /* Optional: Display calibration status */
-  displayCalStatus();
+  //displayCalStatus();
 
   /* Optional: Display sensor status (debug only) */
   //displaySensorStatus();
@@ -191,6 +224,11 @@ void loop(void)
   /* New line for the next sample */
   Serial.println("");
 
-  /* Wait the specified delay before requesting nex data */
-  delay(BNO055_SAMPLERATE_DELAY_MS);
+  /* Wait the specified delay before requesting nex data, then calculate timing */
+  if(millis()-totaltime < BNO055_SAMPLERATE_DELAY_MS)
+  {
+    delay(BNO055_SAMPLERATE_DELAY_MS-(millis()-totaltime));
+  }
+  looptime = millis()-totaltime;
+  totaltime = millis();
 }
