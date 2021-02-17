@@ -44,12 +44,6 @@ imu::Vector<3> linpos;
 unsigned long totaltime;
 unsigned long looptime;
 
-/**************************************************************************/
-/*
-    Displays some basic information on this sensor from the unified
-    sensor API sensor_t type (see Adafruit_Sensor for more information)
-*/
-/**************************************************************************/
 void displaySensorDetails(void)
 {
   sensor_t sensor;
@@ -66,19 +60,12 @@ void displaySensorDetails(void)
   delay(500);
 }
 
-/**************************************************************************/
-/*
-    Display some basic info about the sensor status
-*/
-/**************************************************************************/
 void displaySensorStatus(void)
 {
-  /* Get the system status values (mostly for debugging purposes) */
   uint8_t system_status, self_test_results, system_error;
   system_status = self_test_results = system_error = 0;
   bno.getSystemStatus(&system_status, &self_test_results, &system_error);
 
-  /* Display the results in the Serial Monitor */
   Serial.println("");
   Serial.print("System Status: 0x");
   Serial.println(system_status, HEX);
@@ -90,28 +77,20 @@ void displaySensorStatus(void)
   delay(500);
 }
 
-/**************************************************************************/
-/*
-    Display sensor calibration status
-*/
-/**************************************************************************/
 void displayCalStatus(void)
 {
-  /* Get the four calibration values (0..3) */
   /* Any sensor data reporting 0 should be ignored, */
   /* 3 means 'fully calibrated" */
   uint8_t system, gyro, accel, mag;
   system = gyro = accel = mag = 0;
   bno.getCalibration(&system, &gyro, &accel, &mag);
 
-  /* The data should be ignored until the system calibration is > 0 */
   Serial.print("\t");
   if (!system)
   {
     Serial.print("! ");
   }
-
-  /* Display the individual values */
+  
   Serial.print(system, DEC);
   Serial.print("\t");
   Serial.print(gyro, DEC);
@@ -121,11 +100,6 @@ void displayCalStatus(void)
   Serial.print(mag, DEC);
 }
 
-/**************************************************************************/
-/*
-    Arduino setup function (automatically called at startup)
-*/
-/**************************************************************************/
 void setup(void)
 {
   Serial.begin(115200);
@@ -147,9 +121,10 @@ void setup(void)
   /* Optional: Display current status */
   displaySensorStatus();
 
+  /* Calibrate sensor */
   uint8_t system, gyro, accel, mag;
   system = gyro = accel = mag = 0;
-  bno.getCalibration(&system, &gyro, &accel, &mag);
+    
   while((system+gyro+accel+mag) < 12)
   {
     bno.getCalibration(&system, &gyro, &accel, &mag);
@@ -166,12 +141,6 @@ void setup(void)
   totaltime = millis();
 }
 
-/**************************************************************************/
-/*
-    Arduino loop function, called once 'setup' is complete (your own code
-    should go here)
-*/
-/**************************************************************************/
 void loop(void)
 {
   /* Get and filter sensor data */
@@ -190,6 +159,7 @@ void loop(void)
 
   linacc[0] = linacc[0]/sizeof(linacc);
 
+  /* Trapezoid algorithm to integrate acceleration and velocity */
   linvel[1] = linvel[0];
   linvel[0] = linvel[1] + ( linacc[0]+linacc[1] ).scale( (double)looptime*0.5 );
 
@@ -221,7 +191,6 @@ void loop(void)
   /* Optional: Display sensor status (debug only) */
   //displaySensorStatus();
 
-  /* New line for the next sample */
   Serial.println("");
 
   /* Wait the specified delay before requesting nex data, then calculate timing */
