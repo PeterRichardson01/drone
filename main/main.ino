@@ -2,7 +2,7 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 #include <utility/imumaths.h>
-
+#include <math.h>
 /* This driver uses the Adafruit unified sensor library (Adafruit_Sensor),
    which provides a common 'type' for sensor data and some helper functions.
 
@@ -35,11 +35,13 @@
 //                                   id, address
 Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28);
 
-imu::Vector<3> linacc[5]; //size affects filter size: must be at least 2.
 imu::Vector<3> angle;
 
-imu::Vector<3> linvel[2];
-imu::Vector<3> linpos;
+imu::Vector<3> linaccIMU;
+
+double linacc[4][3]; //size affects filter size: must be at least 2.
+double linvel[2][3];
+double linpos[3];
 
 unsigned long totaltime;
 unsigned long looptime;
@@ -90,7 +92,7 @@ void displayCalStatus(void)
   {
     Serial.print("! ");
   }
-  
+
   Serial.print(system, DEC);
   Serial.print("\t");
   Serial.print(gyro, DEC);
@@ -106,11 +108,11 @@ void setup(void)
   Serial.println("Orientation Sensor Test"); Serial.println("");
 
   /* Initialise the sensor */
-  if(!bno.begin())
+  if (!bno.begin())
   {
     /* There was a problem detecting the BNO055 ... check your connections */
     Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
-    while(1);
+    while (1);
   }
 
   delay(1000);
@@ -124,8 +126,8 @@ void setup(void)
   /* Calibrate sensor */
   uint8_t system, gyro, accel, mag;
   system = gyro = accel = mag = 0;
-    
-  while((system+gyro+accel+mag) < 12)
+
+  while ((system + gyro + accel + mag) < 12)
   {
     bno.getCalibration(&system, &gyro, &accel, &mag);
     Serial.print(system, DEC);
@@ -135,56 +137,85 @@ void setup(void)
     Serial.print(accel, DEC);
     Serial.print("\t");
     Serial.print(mag, DEC);
+    Serial.println("");
+    delay(BNO055_SAMPLERATE_DELAY_MS);
   }
 
   bno.setExtCrystalUse(true);
+  delay(5000);
+
+  /*
+    for(int i = 100)
+    {
+      linacc = bno.getVector(Adafruit_BNO055::Vector_LINEARACCEL);
+      accbias += linacc.scale(
+    }
+  */
+
   totaltime = millis();
 }
 
 void loop(void)
 {
   /* Get and filter sensor data */
-  for(int i = sizeof(linacc)-1; i > 0; i--)
+  for (int i = 3; i > 0; i--)
   {
-    linacc[i] = linacc[i-1];
+    linacc[i][0] = linacc[i - 1][0];
+    linacc[i][1] = linacc[i - 1][1];
+    linacc[i][2] = linacc[i - 1][2];
   }
 
   angle     = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-  linacc[0] = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
+  linaccIMU = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
 
-  for(int i = 0; i < sizeof(linacc); i++)
+  linacc[0][0] = round( linaccIMU.x()*10.0 ) / 10.0;
+  linacc[0][1] = round( linaccIMU.y()*10.0 ) / 10.0;
+  linacc[0][2] = round( linaccIMU.z()*10.0 ) / 10.0;
+
+  for (int i = 1; i < 4; i++)
   {
-    linacc[0] = linacc[0] + linacc[i];
+    linacc[0][0] = linacc[0][0] + linacc[i][0];
+    linacc[0][1] = linacc[0][1] + linacc[i][1];
+    linacc[0][2] = linacc[0][2] + linacc[i][2];
   }
-
-  linacc[0] = linacc[0]/sizeof(linacc);
+  linacc[0][0] = linacc[0][0] / 4.0;
+  linacc[0][1] = linacc[0][1] / 4.0;
+  linacc[0][2] = linacc[0][2] / 4.0;
 
   /* Trapezoid algorithm to integrate acceleration and velocity */
-  linvel[1] = linvel[0];
-  linvel[0] = linvel[1] + ( linacc[0]+linacc[1] ).scale( (double)looptime*0.5 );
+  linvel[1][0] = linvel[0][0];
+  linvel[1][1] = linvel[0][1];
+  linvel[1][2] = linvel[0][2];
 
-  linpos = linpos + ( linvel[0]+linvel[1] ).scale( (double)looptime*0.5 );
+  linvel[0][0] = linvel[1][0] + ( linacc[0][0] + linacc[1][0] ) * ( (double)looptime / 1000 * 0.5 );
+  linvel[0][1] = linvel[1][1] + ( linacc[0][1] + linacc[1][1] ) * ( (double)looptime / 1000 * 0.5 );
+  linvel[0][2] = linvel[1][2] + ( linacc[0][2] + linacc[1][2] ) * ( (double)looptime / 1000 * 0.5 );
+
+  linpos[0] = linpos[0] + ( linvel[0][0] + linvel[1][0] ) * ( (double)looptime / 1000 * 0.5 );
+  linpos[1] = linpos[1] + ( linvel[0][1] + linvel[1][1] ) * ( (double)looptime / 1000 * 0.5 );
+  linpos[2] = linpos[2] + ( linvel[0][2] + linvel[1][2] ) * ( (double)looptime / 1000 * 0.5 );
 
   /*Serial.print(angle.x(), 4);
-  Serial.print("\t");
-  Serial.print(angle.y(), 4);
-  Serial.print("\t");
-  Serial.print(angle.z(), 4);
-  Serial.print("\t");
+    Serial.print("\t");
+    Serial.print(angle.y(), 4);
+    Serial.print("\t");
+    Serial.print(angle.z(), 4);
+    Serial.print("\t");
   */
-  
-  Serial.print(linacc[0].z(), 4);
+
+  Serial.print(linacc[0][2], 4);
   Serial.print("\t");
-  Serial.print(linvel[0].z(), 4);
+  Serial.print(linvel[0][2], 4);
   Serial.print("\t");
-  Serial.print(linpos.z(), 4);
-  
-  /*Serial.print(linacc[0].y(), 4);
-  Serial.print("\t");
-  Serial.print(linacc[0].z(), 4);
-  Serial.print("\t");
+  Serial.print(linpos[2], 4);
+
+
+  /*Serial.print(linacc5[0].y(), 4);
+    Serial.print("\t");
+    Serial.print(linacc5[0].z(), 4);
+    Serial.print("\t");
   */
-  
+
   /* Optional: Display calibration status */
   //displayCalStatus();
 
@@ -194,10 +225,10 @@ void loop(void)
   Serial.println("");
 
   /* Wait the specified delay before requesting nex data, then calculate timing */
-  if(millis()-totaltime < BNO055_SAMPLERATE_DELAY_MS)
+  if (millis() - totaltime < BNO055_SAMPLERATE_DELAY_MS)
   {
-    delay(BNO055_SAMPLERATE_DELAY_MS-(millis()-totaltime));
+    delay(BNO055_SAMPLERATE_DELAY_MS - (millis() - totaltime));
   }
-  looptime = millis()-totaltime;
+  looptime = millis() - totaltime;
   totaltime = millis();
 }
