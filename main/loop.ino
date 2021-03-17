@@ -29,6 +29,10 @@ void loop() {
   motor2.writeMicroseconds(1300 + thrust - pitch - roll);
   motor3.writeMicroseconds(1300 + thrust + pitch + roll);
   motor4.writeMicroseconds(1300 + thrust + pitch - roll);
-  
+
+  if(millis() > 6500)
+  {
+    while(1);
+  }
   while((micros() - tStart) < (SAMPLERATE * 1000)){}
 }

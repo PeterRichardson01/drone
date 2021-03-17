@@ -15,6 +15,12 @@
  
 #define SAMPLERATE (10.0) //100 Hz
 
+//Motors UL-UR-BL-BR --> 1-2-3-4
+#define MOTOR1PIN 11
+#define MOTOR2PIN 10
+#define MOTOR3PIN 9
+#define MOTOR4PIN 6
+
 Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x29);
 Adafruit_BMP3XX bmp;
 
@@ -35,9 +41,3 @@ Servo motor1;
 Servo motor2;
 Servo motor3;
 Servo motor4;
-
-//Motors UL-UR-BL-BR --> 1-2-3-4
-#define MOTOR1PIN 11
-#define MOTOR2PIN 10
-#define MOTOR3PIN 9
-#define MOTOR4PIN 6
