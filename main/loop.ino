@@ -15,9 +15,9 @@ void loop() {
   sensors_event_t event;
   bno.getEvent(&event);
 
-  double thrust = thrustCTL.calculate(desalt,alt);
+  double thrust = thrustCTL.calculate(desalt, alt);
   double pitch = pitchCTL.calculate(0, event.orientation.y);
-  double roll = rollCTL.calculate(0, event.orientation.z);
+  double roll  = rollCTL.calculate (0, event.orientation.z);
 
   //front motors = thrust - pitch
   //back motors = thrust + pitch

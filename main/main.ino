@@ -23,7 +23,7 @@ double bnoOffsetx;
 double bnoOffsety;
 double bnoOffsetz;
 
-double desalt;
+double desalt = 0.25;
 double despitch;
 double desroll;
 

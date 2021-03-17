@@ -35,6 +35,14 @@ void setup() {
   //First few inputs from sensors are inaccurate
   sensors_event_t event;
 
+  
+  delay(5000);
+
+  motor1.writeMicroseconds(1300);
+  motor2.writeMicroseconds(1300);
+  motor3.writeMicroseconds(1300);
+  motor4.writeMicroseconds(1300);
+
   for(int i = 0; i < 1000/SAMPLERATE; i++)
   {
     bno.getEvent(&event);
@@ -42,8 +50,8 @@ void setup() {
     delay(SAMPLERATE);
   }
 
+  //set Offsets to set altitude to 0 at ground and yaw at 0
   bmpOffset = bmp.pressure/100.0;
   bnoOffsetx = event.orientation.x;
 
-  delay(4000);
 }
