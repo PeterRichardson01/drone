@@ -4,7 +4,7 @@ void loop() {
   double alt;
   if (! bmp.performReading())
   {
-    desalt = 0;
+    desalt = -0.1;
     alt = 0.5;
   }
   else
@@ -25,14 +25,14 @@ void loop() {
   //right motors = thrust - roll
 
   //Motors UL-UR-BL-BR --> 1-2-3-4
-  motor1.writeMicroseconds(1300 + thrust - pitch + roll);
-  motor2.writeMicroseconds(1300 + thrust - pitch - roll);
-  motor3.writeMicroseconds(1300 + thrust + pitch + roll);
-  motor4.writeMicroseconds(1300 + thrust + pitch - roll);
+  motor1.writeMicroseconds(1200 + thrust - pitch + roll);
+  motor2.writeMicroseconds(1200 + thrust - pitch - roll);
+  motor3.writeMicroseconds(1200 + thrust + pitch + roll);
+  motor4.writeMicroseconds(1200 + thrust + pitch - roll);
 
   if(millis() > 6500)
   {
-    while(1);
+    desalt = -0.1;
   }
   while((micros() - tStart) < (SAMPLERATE * 1000)){}
 }
