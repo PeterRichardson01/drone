@@ -13,7 +13,7 @@
 #define BMP_MOSI 11
 #define BMP_CS 10
  
-#define SAMPLERATE (10.0) //100 Hz
+#define SAMPLERATE (25.0) //40 Hz
 
 //Motors UL-UR-BL-BR --> 1-2-3-4
 #define MOTOR1PIN 11
@@ -25,19 +25,24 @@ Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x29);
 Adafruit_BMP3XX bmp;
 
 double bmpOffset;
-double bnoOffsetx;
-double bnoOffsety;
-double bnoOffsetz;
 
-double desalt = 0.25;
+double desalt;
 double despitch;
 double desroll;
 
-PID thrustCTL = PID(SAMPLERATE/1000.0, 200.0, 0.0, 20.0, 5.0, 0.0);
-PID pitchCTL = PID(SAMPLERATE/1000.0, 10.0, -10.0, 10.0, 2.5, 1.0);
-PID rollCTL = PID(SAMPLERATE/1000.0, 10.0, -10.0, 10.0, 2.5, 1.0);
+PID thrustCTL = PID(SAMPLERATE/1000.0, 200.0, 0.0, 400.0, 150.0, 1.0);
+/*
+PID pitchCTL = PID(SAMPLERATE/1000.0, 10.0, -10.0, 5.0, 2.0, 0.05);
+PID rollCTL = PID(SAMPLERATE/1000.0, 10.0, -10.0, 5.0, 2.0, 0.05);
+PID yawCTL = PID(SAMPLERATE/1000.0, 10.0, -10.0, 5.0, 2.0, 0.05);
+*/
+PID pitchCTL = PID(SAMPLERATE/1000.0, 15.0, -15.0, 1.0, 0.0, 0.4);
+PID rollCTL = PID(SAMPLERATE/1000.0, 15.0, -15.0, 1.0, 0.0, 0.4);
+PID yawCTL = PID(SAMPLERATE/1000.0, 50.0, -50.0, 1.0, 0.0, 0.0);
 
 Servo motor1;
 Servo motor2;
 Servo motor3;
 Servo motor4;
+
+double alt[5];
