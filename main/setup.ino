@@ -1,5 +1,5 @@
 void setup() {
-
+  Serial.begin(115200);
   motor1.attach(MOTOR1PIN);
   motor2.attach(MOTOR2PIN);
   motor3.attach(MOTOR3PIN);
@@ -37,12 +37,14 @@ void setup() {
 
   
   delay(5000);
-
-  motor1.writeMicroseconds(1300);
-  motor2.writeMicroseconds(1300);
-  motor3.writeMicroseconds(1300);
-  motor4.writeMicroseconds(1300);
-
+  
+  
+  motor1.writeMicroseconds(1200);
+  motor2.writeMicroseconds(1200);
+  motor3.writeMicroseconds(1200);
+  motor4.writeMicroseconds(1200);
+  
+  
   for(int i = 0; i < 1000/SAMPLERATE; i++)
   {
     bno.getEvent(&event);
@@ -52,6 +54,5 @@ void setup() {
 
   //set Offsets to set altitude to 0 at ground and yaw at 0
   bmpOffset = bmp.pressure/100.0;
-  bnoOffsetx = event.orientation.x;
 
 }
