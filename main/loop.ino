@@ -55,10 +55,10 @@ void loop() {
   if(millis() < 0)//10500)
   {
     //Motors UL-UR-BL-BR --> 1-2-3-4
-    motor1.writeMicroseconds(1200 + thrust - pitch + roll + yaw);
-    motor2.writeMicroseconds(1200 + thrust - pitch - roll - yaw);
-    motor3.writeMicroseconds(1200 + thrust + pitch + roll - yaw);
-    motor4.writeMicroseconds(1200 + thrust + pitch - roll + yaw);
+    motor1.writeMicroseconds(1320 - pitch + roll + yaw);
+    motor2.writeMicroseconds(1320 - pitch - roll - yaw);
+    motor3.writeMicroseconds(1320 + pitch + roll - yaw);
+    motor4.writeMicroseconds(1320 + pitch - roll + yaw);
 
     /*
     Serial.print(event.orientation.x);
@@ -78,10 +78,15 @@ void loop() {
     motor4.writeMicroseconds(1000);
   }*/
 
+  /*
   Serial.print(millis());
   Serial.print("\t");
   Serial.print(alt[0]);
   Serial.print("\t");
   Serial.println(bmp.readAltitude(bmpOffset));
+  */
+  Serial.print(pitch);
+  Serial.print("\t");
+  Serial.println(roll);
   while((micros() - tStart) < (SAMPLERATE * 1000)){}
 }
