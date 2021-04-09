@@ -30,7 +30,7 @@ double desalt;
 double despitch;
 double desroll;
 
-PID thrustCTL = PID(SAMPLERATE/1000.0, 200.0, 0.0, 400.0, 150.0, 1.0);
+PID thrustCTL = PID(SAMPLERATE/1000.0, 10.0, -10.0, 100.0, 0.0, 40.0);
 /*
 PID pitchCTL = PID(SAMPLERATE/1000.0, 10.0, -10.0, 5.0, 2.0, 0.05);
 PID rollCTL = PID(SAMPLERATE/1000.0, 10.0, -10.0, 5.0, 2.0, 0.05);
