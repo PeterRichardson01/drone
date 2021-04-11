@@ -39,10 +39,10 @@ void setup() {
   delay(5000);
   
   
-  motor1.writeMicroseconds(1200);
-  motor2.writeMicroseconds(1200);
-  motor3.writeMicroseconds(1200);
-  motor4.writeMicroseconds(1200);
+  motor1.writeMicroseconds(1400);
+  motor2.writeMicroseconds(1400);
+  motor3.writeMicroseconds(1400);
+  motor4.writeMicroseconds(1400);
   
   
   for(int i = 0; i < 1000/SAMPLERATE; i++)
