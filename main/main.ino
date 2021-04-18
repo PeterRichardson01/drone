@@ -21,6 +21,12 @@
 #define MOTOR3PIN 9
 #define MOTOR4PIN 6
 
+//Receiver Channels
+#define CH1PIN 2
+#define CH2PIN 3
+#define CH3PIN 4
+#define CH4PIN 5
+
 Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x29);
 Adafruit_BMP3XX bmp;
 
@@ -29,6 +35,7 @@ double bmpOffset;
 double desalt;
 double despitch;
 double desroll;
+double desyaw;
 
 PID thrustCTL = PID(SAMPLERATE/1000.0, 10.0, -10.0, 10.0, 0.0, 7.5);
 /*
@@ -38,7 +45,7 @@ PID yawCTL = PID(SAMPLERATE/1000.0, 10.0, -10.0, 5.0, 2.0, 0.05);
 */
 PID pitchCTL = PID(SAMPLERATE/1000.0, 15.0, -15.0, 0.5, 0.0, 0.7);
 PID rollCTL = PID(SAMPLERATE/1000.0, 15.0, -15.0, 0.5, 0.0, 0.7);
-PID yawCTL = PID(SAMPLERATE/1000.0, 100.0, -100.0, 4.0, 4.0, 0.0);
+PID yawCTL = PID(SAMPLERATE/1000.0, 100.0, -100.0, 4.0, 1.0, 0.0);
 
 Servo motor1;
 Servo motor2;
