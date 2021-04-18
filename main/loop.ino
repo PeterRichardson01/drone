@@ -20,20 +20,35 @@ void loop() {
   sensors_event_t event;
   bno.getEvent(&event);
 
-  desalt = 0.2;
+  if(millis()>10000)
+  {
+    desalt = desalt - 0.5;
+  }
 
+  long ch1, ch2, ch3, ch4;
+  ch1 = pulseIn(CH1PIN, HIGH); //altitude
+  ch2 = pulseIn(CH2PIN, HIGH); //yaw
+  ch3 = pulseIn(CH3PIN, HIGH); //pitch
+  ch4 = pulseIn(CH4PIN, HIGH); //roll
+
+  //channel values now between 1000 min and 2000 max
+  
+  desalt = desalt - (double(ch1) - 1000.0)/500.0*SAMPLERATE/1000.0 //changes within 1 m/s
+  despitch = (double(ch3) - 1000.0)/100.0; //angle within +/- 5 degrees
+  desroll = (double(ch4) - 1000.0)/100.0; //angle within +/- 5 degrees
+  desyaw = (double(ch2) - 1500.0)*150.0/500.0; // angle within +/- 150 degrees
 
   double thrust = thrustCTL.calculate(desalt, alt[0]);
-  double pitch = pitchCTL.calculate(0, event.orientation.y);
-  double roll  = rollCTL.calculate (0, event.orientation.z);
+  double pitch = pitchCTL.calculate(despitch, event.orientation.y);
+  double roll  = rollCTL.calculate (desroll, event.orientation.z);
   double yaw;
-  if(event.orientation.x < 180)
+  if(event.orientation.x < 180.0)
   {
-    yaw = yawCTL.calculate(0, event.orientation.x);
+    yaw = yawCTL.calculate(desyaw, event.orientation.x);
   }
   else
   {
-    yaw = yawCTL.calculate(0, event.orientation.x - 360.0);
+    yaw = yawCTL.calculate(desyaw, event.orientation.x - 360.0);
   }
   
   //front motors = thrust - pitch
@@ -43,21 +58,11 @@ void loop() {
   
   //Motors UL-UR-BL-BR --> 1-2-3-4
 
-  if(millis() < 20000)
-  {
   motor1.writeMicroseconds(1440 + thrust - pitch + roll + yaw);
   motor2.writeMicroseconds(1440 + thrust - pitch - roll - yaw);
   motor3.writeMicroseconds(1440 + thrust + pitch + roll - yaw);
   motor4.writeMicroseconds(1440 + thrust + pitch - roll + yaw);
-  }
-  else
-  {
-  motor1.writeMicroseconds(1000);
-  motor2.writeMicroseconds(1000);
-  motor3.writeMicroseconds(1000);
-  motor4.writeMicroseconds(1000);
-  }
-
+  Serial.println(1440 + thrust - pitch + roll + yaw);
   /*
   Serial.print(event.orientation.x);
   Serial.print("\t");
