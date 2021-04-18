@@ -7,7 +7,7 @@ PID::PID(double DT, double MAX, double MIN, double KP, double KD, double KI)
   kp = KP;
   kd = KD;
   ki = KI;
-  preerr = 0;
+  prev = 0;
   integ = 0;
 }
 
@@ -20,7 +20,7 @@ double PID::calculate(double set, double curr)
   integ += err*dt;
   double Iout = ki*integ;
 
-  double deriv = (err-preerr)/dt;
+  double deriv = (curr-prev)/dt;
   double Dout = kd*deriv;
 
   double Out = Pout + Iout + Dout;
@@ -34,7 +34,7 @@ double PID::calculate(double set, double curr)
     Out = mini;
   }
 
-  preerr = err;
+  prev = curr;
 
   return Out;
 }
