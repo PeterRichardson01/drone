@@ -1,5 +1,11 @@
 void setup() {
   Serial.begin(115200);
+
+  pinMode(CH1PIN, INPUT);
+  pinMode(CH2PIN, INPUT);
+  pinMode(CH3PIN, INPUT);
+  pinMode(CH4PIN, INPUT);
+  
   motor1.attach(MOTOR1PIN);
   motor2.attach(MOTOR2PIN);
   motor3.attach(MOTOR3PIN);
@@ -54,5 +60,5 @@ void setup() {
 
   //set Offsets to set altitude to 0 at ground and yaw at 0
   bmpOffset = bmp.pressure/100.0;
-
+  desalt = 0.0;
 }
