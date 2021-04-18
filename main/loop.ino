@@ -58,11 +58,20 @@ void loop() {
   
   //Motors UL-UR-BL-BR --> 1-2-3-4
 
-  motor1.writeMicroseconds(1440 + thrust - pitch + roll + yaw);
-  motor2.writeMicroseconds(1440 + thrust - pitch - roll - yaw);
-  motor3.writeMicroseconds(1440 + thrust + pitch + roll - yaw);
-  motor4.writeMicroseconds(1440 + thrust + pitch - roll + yaw);
-  Serial.println(1440 + thrust - pitch + roll + yaw);
+  if(ch1 < 1050)
+  {
+    motor1.writeMicroseconds(1000);
+    motor2.writeMicroseconds(1000);
+    motor3.writeMicroseconds(1000);
+    motor4.writeMicroseconds(1000);
+  }
+  else
+  {
+    motor1.writeMicroseconds(1440 + thrust - pitch + roll + yaw);
+    motor2.writeMicroseconds(1440 + thrust - pitch - roll - yaw);
+    motor3.writeMicroseconds(1440 + thrust + pitch + roll - yaw);
+    motor4.writeMicroseconds(1440 + thrust + pitch - roll + yaw);
+  }
   /*
   Serial.print(event.orientation.x);
   Serial.print("\t");
