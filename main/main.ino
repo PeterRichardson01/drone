@@ -45,7 +45,7 @@ PID yawCTL = PID(SAMPLERATE/1000.0, 10.0, -10.0, 5.0, 2.0, 0.05);
 */
 PID pitchCTL = PID(SAMPLERATE/1000.0, 15.0, -15.0, 0.5, 0.0, 0.7);
 PID rollCTL = PID(SAMPLERATE/1000.0, 15.0, -15.0, 0.5, 0.0, 0.7);
-PID yawCTL = PID(SAMPLERATE/1000.0, 100.0, -100.0, 4.0, 1.0, 0.0);
+PID yawCTL = PID(SAMPLERATE/1000.0, 100.0, -100.0, 4.0, 0.1, 0.0);
 
 Servo motor1;
 Servo motor2;
