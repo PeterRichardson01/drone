@@ -33,9 +33,9 @@ void loop() {
 
   //channel values now between 1000 min and 2000 max
   
-  desalt = desalt - (double(ch1) - 1000.0)/500.0*SAMPLERATE/1000.0 //changes within 1 m/s
-  despitch = (double(ch3) - 1000.0)/100.0; //angle within +/- 5 degrees
-  desroll = (double(ch4) - 1000.0)/100.0; //angle within +/- 5 degrees
+  desalt = desalt - (double(ch1) - 1500.0)/500.0*SAMPLERATE/1000.0; //changes within 1 m/s
+  despitch = (double(ch3) - 1500.0)/50.0; //angle within +/- 10 degrees
+  desroll = (double(ch4) - 1500.0)/50.0; //angle within +/- 10 degrees
   desyaw = (double(ch2) - 1500.0)*150.0/500.0; // angle within +/- 150 degrees
 
   double thrust = thrustCTL.calculate(desalt, alt[0]);
@@ -102,6 +102,14 @@ void loop() {
 
   //Serial.println(event.orientation.x);
   //Serial.println(yaw);
+
+  Serial.print(ch1);
+  Serial.print("\t");
+  Serial.print(ch2);
+  Serial.print("\t");
+  Serial.print(ch3);
+  Serial.print("\t");
+  Serial.println(ch4);
   
   while((micros() - tStart) < (SAMPLERATE * 1000)){}
   //Serial.println(micros()-tStart);
