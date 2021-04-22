@@ -1,5 +1,5 @@
 
-PID::PID(double DT, double MAX, double MIN, double KP, double KD, double KI)
+PID::PID(double DT, double MAX, double MIN, double KP, double KI, double KD)
 {
   dt = DT;
   maxi = MAX;
