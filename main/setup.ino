@@ -1,5 +1,5 @@
 void setup() {
-  Serial.begin(115200);
+  //Serial.begin(115200);
 
   pinMode(CH1PIN, INPUT);
   pinMode(CH2PIN, INPUT);
@@ -15,8 +15,8 @@ void setup() {
   motor2.writeMicroseconds(1000);
   motor3.writeMicroseconds(1000);
   motor4.writeMicroseconds(1000);
-  
-  if(!bno.begin())
+
+   if(!bno.begin())
   {
     /* There was a problem detecting the BNO055 ... check your connections */
     Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
@@ -37,20 +37,16 @@ void setup() {
   bmp.setPressureOversampling(BMP3_OVERSAMPLING_4X);
   bmp.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
   bmp.setOutputDataRate(BMP3_ODR_50_HZ);
-
-  //First few inputs from sensors are inaccurate
-  sensors_event_t event;
-
   
   delay(5000);
   
+  motor1.writeMicroseconds(1435);
+  motor2.writeMicroseconds(1445);
+  motor3.writeMicroseconds(1445);
+  motor4.writeMicroseconds(1435);
   
-  motor1.writeMicroseconds(1400);
-  motor2.writeMicroseconds(1400);
-  motor3.writeMicroseconds(1400);
-  motor4.writeMicroseconds(1400);
-  
-  
+  //First few inputs from sensors are inaccurate
+  sensors_event_t event;
   for(int i = 0; i < 1000/SAMPLERATE; i++)
   {
     bno.getEvent(&event);
