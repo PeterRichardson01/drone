@@ -25,18 +25,24 @@ void loop() {
     desalt = desalt - 0.5;
   }
 
+  /*
   long ch1, ch2, ch3, ch4;
   ch1 = pulseIn(CH1PIN, HIGH); //altitude
   ch2 = pulseIn(CH2PIN, HIGH); //yaw
   ch3 = pulseIn(CH3PIN, HIGH); //pitch
   ch4 = pulseIn(CH4PIN, HIGH); //roll
-
-  //channel values now between 1000 min and 2000 max
   
+  //channel values now between 1000 min and 2000 max
+
   desalt = desalt - (double(ch1) - 1500.0)/500.0*SAMPLERATE/1000.0; //changes within 1 m/s
   despitch = (double(ch3) - 1500.0)/50.0; //angle within +/- 10 degrees
   desroll = (double(ch4) - 1500.0)/50.0; //angle within +/- 10 degrees
   desyaw = (double(ch2) - 1500.0)*150.0/500.0; // angle within +/- 150 degrees
+  */
+  desalt = 0;
+  despitch = 0;
+  desroll = 0;
+  desyaw = 0;
 
   double thrust = thrustCTL.calculate(desalt, alt[0]);
   double pitch = pitchCTL.calculate(despitch, event.orientation.y);
@@ -58,7 +64,7 @@ void loop() {
   
   //Motors UL-UR-BL-BR --> 1-2-3-4
 
-  if(ch1 < 1050)
+  /*if(ch1 < 1050)
   {
     motor1.writeMicroseconds(1000);
     motor2.writeMicroseconds(1000);
@@ -66,17 +72,20 @@ void loop() {
     motor4.writeMicroseconds(1000);
   }
   else
-  {
-    motor1.writeMicroseconds(1440 + thrust - pitch + roll + yaw);
-    motor2.writeMicroseconds(1440 + thrust - pitch - roll - yaw);
-    motor3.writeMicroseconds(1440 + thrust + pitch + roll - yaw);
-    motor4.writeMicroseconds(1440 + thrust + pitch - roll + yaw);
-  }
+  {*/
+    motor1.writeMicroseconds(1435 + thrust - pitch + roll + yaw);
+    motor2.writeMicroseconds(1445 + thrust - pitch - roll - yaw);
+    motor3.writeMicroseconds(1445 + thrust + pitch + roll - yaw);
+    motor4.writeMicroseconds(1435 + thrust + pitch - roll + yaw);
+  //}
+
   /*
   Serial.print(event.orientation.x);
   Serial.print("\t");
   Serial.println(yaw);
+  */
   
+  /*
   Serial.println(SAMPLERATE/1000.0);
   Serial.println(yawCTL.getDT());
   Serial.println(yawCTL.getinteg());
@@ -103,6 +112,7 @@ void loop() {
   //Serial.println(event.orientation.x);
   //Serial.println(yaw);
 
+  /*
   Serial.print(ch1);
   Serial.print("\t");
   Serial.print(ch2);
@@ -110,6 +120,7 @@ void loop() {
   Serial.print(ch3);
   Serial.print("\t");
   Serial.println(ch4);
+  */
   
   while((micros() - tStart) < (SAMPLERATE * 1000)){}
   //Serial.println(micros()-tStart);
