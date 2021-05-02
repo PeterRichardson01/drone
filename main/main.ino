@@ -5,6 +5,7 @@
 #include "Adafruit_BMP3XX.h"
 #include <Adafruit_BNO055.h>
 #include <utility/imumaths.h>
+#include <PinChangeInt.h>
 
 #include "pid.h"
 
@@ -27,6 +28,13 @@
 #define CH3PIN 4
 #define CH4PIN 5
 
+volatile unsigned long prev_time1 = 0;
+volatile unsigned long prev_time2 = 0;
+volatile unsigned long prev_time3 = 0;
+volatile unsigned long prev_time4 = 0;
+
+volatile unsigned long ch1, ch2, ch3, ch4;
+
 Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x29);
 Adafruit_BMP3XX bmp;
 
@@ -37,14 +45,15 @@ double despitch;
 double desroll;
 double desyaw;
 
-PID thrustCTL = PID(SAMPLERATE/1000.0, 10.0, -10.0, 0.0, 0.0, 0.0);
+PID thrustCTL = PID(SAMPLERATE/1000.0, 10.0, -10.0, 1.0, 0.005, 0.02);
 /*
 PID pitchCTL = PID(SAMPLERATE/1000.0, 10.0, -10.0, 5.0, 2.0, 0.05);
 PID rollCTL = PID(SAMPLERATE/1000.0, 10.0, -10.0, 5.0, 2.0, 0.05);
 PID yawCTL = PID(SAMPLERATE/1000.0, 10.0, -10.0, 5.0, 2.0, 0.05);
 */
-PID pitchCTL = PID(SAMPLERATE/1000.0, 15.0, -15.0, 1, 0.0, 0.011);
-PID rollCTL = PID(SAMPLERATE/1000.0, 15.0, -15.0, 1, 0.0, 0.011);
+
+PID pitchCTL = PID(SAMPLERATE/1000.0, 15.0, -15.0, 1.0, 0.005, 0.02);
+PID rollCTL = PID(SAMPLERATE/1000.0, 15.0, -15.0, 1.0, 0.02, 0.02);
 PID yawCTL = PID(SAMPLERATE/1000.0, 100.0, -100.0, 4.0, 0.1, 0.0);
 
 Servo motor1;
@@ -53,3 +62,5 @@ Servo motor3;
 Servo motor4;
 
 double alt[5];
+
+unsigned long tStart;
